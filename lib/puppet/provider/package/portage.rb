@@ -107,14 +107,14 @@ Puppet::Type.type(:package).provide :portage, :parent => Puppet::Provider::Packa
 
             case packages.size
                 when 0
-                    not_found_value = "%s/%s" % [@resource[:category] ? @resource[:category] : "<unspecified category>", @resource[:name]]
-                    raise Puppet::Error.new("No package found with the specified name [#{not_found_value}]")
+                    nil
                 when 1
                     return packages[0]
                 else
                     raise Puppet::Error.new("More than one package with the specified name [#{search_value}], please use the category parameter to disambiguate")
             end
         rescue Puppet::ExecutionFailure => detail
+            return {:ensure => :absent} if detail.message =~ /returned 1/
             raise Puppet::Error.new(detail)
         end
     end
